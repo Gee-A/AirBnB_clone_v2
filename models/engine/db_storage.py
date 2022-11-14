@@ -26,7 +26,8 @@ class DBStorage():
         db = getenv("HBNB_MYSQL_DB")
         env = getenv("HBNB_ENV")
         self.__engine = create_engine(
-            f"mysql+mysqldb://{user}:{passwd}@{host}:3306/{db}", pool_pre_ping=True)
+            f"mysql+mysqldb://{user}:{passwd}@{host}:3306/{db}",
+            pool_pre_ping=True)
         if env == 'test':
             metadata_obj = MetaData()
             metadata_obj.drop_all(self.__engine)
@@ -55,7 +56,10 @@ class DBStorage():
 
     def save(self):
         """Commit all changes of the current database session"""
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception:
+            self.__session.rollback()
 
     def delete(self, obj=None):
         """Delete obj from the current database seesion"""
@@ -69,3 +73,7 @@ class DBStorage():
         session = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session)
         self.__session = Session()
+
+    def close(self):
+        """Call remove method on private session attribute"""
+        self.__session.close()

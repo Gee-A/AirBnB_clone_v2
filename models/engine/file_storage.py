@@ -66,3 +66,7 @@ class FileStorage:
             if ob.id == obj.id:
                 del self.__objects[key]
                 return
+
+    def close(self):
+        """deserializes JSON file to objects"""
+        return self.reload()
